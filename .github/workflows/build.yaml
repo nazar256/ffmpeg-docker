@@ -24,7 +24,7 @@ on:
       - '*'
 
 env:
-  RELEASE_VERSION: ${{ github.ref_type == 'tag' && github.ref_name }}
+  RELEASE_VERSION: ${{ github.ref_name }}
   FF_VERSION: ${{ inputs.ff_version || '7.1' }}
   ALPINE_VERSION: ${{ inputs.alpine_version || '3.19' }}
   FDK_AAC_VERSION: ${{ inputs.fdk_aac_version || '2.0.3' }}
@@ -54,6 +54,8 @@ jobs:
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
 
+        # does not build on alpine: 3.18
+        # builds on alpine: edge?(x265-yes,fdk-aac-no)
       - name: Build linux/arm64/v8
         uses: docker/build-push-action@v4
         with:
@@ -129,7 +131,8 @@ jobs:
             X265_VERSION=${{ env.X265_VERSION }}
           context: .
 
-      - name: Build linux/amd64
+        # builds on alpine: 3.18
+      - name: Build amd64,386
         uses: docker/build-push-action@v4
         with:
             platforms: linux/amd64,linux/386

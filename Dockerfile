@@ -49,7 +49,7 @@ RUN wget https://bitbucket.org/multicoreware/x265_git/downloads/x265_${X265_VERS
     tar xf x265_${X265_VERSION}.tar.gz && \
     cd x265_${X265_VERSION}/build/linux && \
     cmake ../../source && \
-    make -j1 && \
+    make -j$(nproc) && \
     make install
 
 # Build and install libfdk-aac
@@ -60,7 +60,7 @@ RUN wget https://github.com/mstorsjo/fdk-aac/archive/v${FDK_AAC_VERSION}.tar.gz 
     cd fdk-aac-${FDK_AAC_VERSION} && \
     autoreconf -fiv && \
     ./configure --prefix=/usr --enable-shared && \
-    make -j1 && \
+    make -j$(nproc) && \
     make install
 
 # Download and build FFmpeg
@@ -92,7 +92,7 @@ RUN wget https://ffmpeg.org/releases/ffmpeg-${FF_VERSION}.tar.xz && \
         --disable-ffplay \
         --extra-cflags="-I/usr/include" \
         --extra-ldflags="-L/usr/lib" && \
-    make -j1 && \
+    make -j$(nproc) && \
     make install && \
     make distclean
 
