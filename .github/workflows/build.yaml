@@ -11,12 +11,17 @@ on:
       alpine_version:
         description: 'Alpine version to use'
         required: false
-        default: '3.21'
+        default: '3.19'
         type: string
       fdk_aac_version:
         description: 'FDK-AAC version to use'
         required: false
         default: '2.0.3'
+        type: string
+      x265_version:
+        description: 'x265 version to use'
+        required: false
+        default: '4.1'
         type: string
   push:
     tags:

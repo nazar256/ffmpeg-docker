@@ -1,5 +1,5 @@
 ARG FF_VERSION=7.1
-ARG ALPINE_VERSION=3
+ARG ALPINE_VERSION=3.19
 ARG FDK_AAC_VERSION=2.0.3
 ARG X265_VERSION=4.1
 
@@ -13,6 +13,7 @@ ARG X265_VERSION
 RUN apk add --no-cache \
     bash \
     build-base \
+    g++ \
     pkgconfig \
     yasm \
     nasm \
@@ -48,13 +49,14 @@ RUN wget https://bitbucket.org/multicoreware/x265_git/downloads/x265_${X265_VERS
     make install
 
 # Build and install libfdk-aac
+# using single thread to avoid build failure (probably lack of memory or race condition)
 WORKDIR /tmp/fdk-aac
 RUN wget https://github.com/mstorsjo/fdk-aac/archive/v${FDK_AAC_VERSION}.tar.gz && \
     tar xf v${FDK_AAC_VERSION}.tar.gz && \
     cd fdk-aac-${FDK_AAC_VERSION} && \
     autoreconf -fiv && \
     ./configure --prefix=/usr --enable-shared && \
-    make -j$(nproc) && \
+    make -j1 && \
     make install
 
 # Download and build FFmpeg
@@ -90,9 +92,9 @@ FROM alpine:${ALPINE_VERSION}
 RUN addgroup -g 10000 -S ffmpeg && \
     adduser -S ffmpeg -G ffmpeg -u 10000
 
-COPY --from=builder /usr/bin/* /usr/bin
-COPY --from=builder /usr/lib/* /usr/lib
-COPY --from=builder /usr/include/* /usr/include
+COPY --from=builder /usr/bin/ffmpeg /usr/bin/
+COPY --from=builder /usr/bin/ffprobe /usr/bin/
+COPY --from=builder /usr/lib/lib*.so* /usr/lib/
 
 ENV LD_LIBRARY_PATH=/usr/local/lib:/usr/lib
 
