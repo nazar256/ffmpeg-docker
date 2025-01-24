@@ -1,7 +1,7 @@
 ARG FF_VERSION=7.1
-ARG ALPINE_VERSION=3.18
-ARG FDK_AAC_VERSION=2.0.3
-ARG X265_VERSION=4.1
+ARG ALPINE_VERSION=3
+# ARG FDK_AAC_VERSION=2.0.3
+# ARG X265_VERSION=4.1
 
 FROM alpine:${ALPINE_VERSION} AS builder
 
@@ -29,6 +29,7 @@ RUN apk add --no-cache \
     libtool \
     x264-dev \
     x265-dev \
+    fdk-aac-dev \
     libvpx-dev \
     opus-dev \
     lame-dev \
@@ -44,16 +45,16 @@ RUN apk add --no-cache \
     sdl2-dev \
     zlib-dev
 
-# Build and install libfdk-aac
-# using single thread to avoid build failure (probably lack of memory or race condition)
-WORKDIR /tmp/fdk-aac
-RUN wget https://github.com/mstorsjo/fdk-aac/archive/v${FDK_AAC_VERSION}.tar.gz && \
-    tar xf v${FDK_AAC_VERSION}.tar.gz && \
-    cd fdk-aac-${FDK_AAC_VERSION} && \
-    autoreconf -fiv && \
-    ./configure --prefix=/usr --enable-shared && \
-    make -j$(nproc) && \
-    make install
+# # Build and install libfdk-aac
+# # using single thread to avoid build failure (probably lack of memory or race condition)
+# WORKDIR /tmp/fdk-aac
+# RUN wget https://github.com/mstorsjo/fdk-aac/archive/v${FDK_AAC_VERSION}.tar.gz && \
+#     tar xf v${FDK_AAC_VERSION}.tar.gz && \
+#     cd fdk-aac-${FDK_AAC_VERSION} && \
+#     autoreconf -fiv && \
+#     ./configure --prefix=/usr --enable-shared && \
+#     make -j$(nproc) && \
+#     make install
 
 # Download and build FFmpeg
 WORKDIR /tmp/ffmpeg
