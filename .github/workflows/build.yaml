@@ -26,7 +26,7 @@ on:
 env:
   RELEASE_VERSION: ${{ github.ref_name }}
   FF_VERSION: ${{ inputs.ff_version || '7.1' }}
-  ALPINE_VERSION: ${{ inputs.alpine_version || '3.19' }}
+  ALPINE_VERSION: ${{ inputs.alpine_version || '3.21' }}
   FDK_AAC_VERSION: ${{ inputs.fdk_aac_version || '2.0.3' }}
   X265_VERSION: ${{ inputs.x265_version || '4.1' }}
 

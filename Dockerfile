@@ -28,6 +28,7 @@ RUN apk add --no-cache \
     automake \
     libtool \
     x264-dev \
+    x265-dev \
     libvpx-dev \
     opus-dev \
     lame-dev \
@@ -42,15 +43,6 @@ RUN apk add --no-cache \
     rtmpdump-dev \
     sdl2-dev \
     zlib-dev
-
-# Build and install libx265
-WORKDIR /tmp/x265
-RUN wget https://bitbucket.org/multicoreware/x265_git/downloads/x265_${X265_VERSION}.tar.gz && \
-    tar xf x265_${X265_VERSION}.tar.gz && \
-    cd x265_${X265_VERSION}/build/linux && \
-    cmake ../../source && \
-    make -j$(nproc) && \
-    make install
 
 # Build and install libfdk-aac
 # using single thread to avoid build failure (probably lack of memory or race condition)
