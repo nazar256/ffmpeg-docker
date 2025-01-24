@@ -40,7 +40,6 @@ RUN apk add --no-cache \
     libdrm-dev \
     openssl-dev \
     rtmpdump-dev \
-    rav1e-dev \
     sdl2-dev \
     zlib-dev
 
@@ -86,7 +85,6 @@ RUN wget https://ffmpeg.org/releases/ffmpeg-${FF_VERSION}.tar.xz && \
         --enable-libfreetype \
         --enable-sdl2 \
         --enable-librtmp \
-        --enable-librav1e \
         --enable-postproc \
         --enable-openssl \
         --disable-debug \
