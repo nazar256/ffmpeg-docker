@@ -1,5 +1,5 @@
 ARG FF_VERSION=7.1
-ARG ALPINE_VERSION=3.21
+ARG ALPINE_VERSION=3
 ARG FDK_AAC_VERSION=2.0.3
 ARG X265_VERSION=4.1
 
@@ -11,6 +11,7 @@ ARG X265_VERSION
 
 # Install build dependencies
 RUN apk add --no-cache \
+    bash \
     build-base \
     pkgconfig \
     yasm \
@@ -19,6 +20,7 @@ RUN apk add --no-cache \
     xz \
     wget \
     cmake \
+    ncurses-dev \
     make \
     autoconf \
     automake \
@@ -41,7 +43,7 @@ WORKDIR /tmp/x265
 RUN wget https://bitbucket.org/multicoreware/x265_git/downloads/x265_${X265_VERSION}.tar.gz && \
     tar xf x265_${X265_VERSION}.tar.gz && \
     cd x265_${X265_VERSION}/build/linux && \
-    bash ./make-Makefiles.bash && \
+    cmake ../../source && \
     make -j$(nproc) && \
     make install
 
