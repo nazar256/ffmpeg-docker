@@ -6,22 +6,18 @@ on:
       ff_version:
         description: 'FFmpeg version to use'
         required: false
-        default: '7.1'
         type: string
       alpine_version:
         description: 'Alpine version to use'
         required: false
-        default: '3.19'
         type: string
       fdk_aac_version:
         description: 'FDK-AAC version to use'
         required: false
-        default: '2.0.3'
         type: string
       x265_version:
         description: 'x265 version to use'
         required: false
-        default: '4.1'
         type: string
   push:
     tags:
@@ -29,10 +25,10 @@ on:
 
 env:
   RELEASE_VERSION: ${{ github.ref_type == 'tag' && github.ref_name }}
-  FF_VERSION: ${{ inputs.ff_version }}
-  ALPINE_VERSION: ${{ inputs.alpine_version }}
-  FDK_AAC_VERSION: ${{ inputs.fdk_aac_version }}
-  X265_VERSION: ${{ inputs.x265_version }}
+  FF_VERSION: ${{ inputs.ff_version || '7.1' }}
+  ALPINE_VERSION: ${{ inputs.alpine_version || '3.20' }}
+  FDK_AAC_VERSION: ${{ inputs.fdk_aac_version || '2.0.3' }}
+  X265_VERSION: ${{ inputs.x265_version || '4.1' }}
 
 jobs:
   buildx:
@@ -62,36 +58,6 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           platforms: linux/arm64/v8,linux/arm/v7,linux/ppc64le,linux/amd64
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}
-            ghcr.io/${{ github.repository_owner }}/ffmpeg:latest
-          build-args: |
-            ALPINE_VERSION=${{ env.ALPINE_VERSION }}
-            FDK_AAC_VERSION=${{ env.FDK_AAC_VERSION }}
-            FF_VERSION=${{ env.FF_VERSION }}
-            X265_VERSION=${{ env.X265_VERSION }}
-          context: .
-
-      - name: Build for linux/arm/v7
-        uses: docker/build-push-action@v4
-        with:
-          platforms: linux/arm/v7
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}
-            ghcr.io/${{ github.repository_owner }}/ffmpeg:latest
-          build-args: |
-            ALPINE_VERSION=${{ env.ALPINE_VERSION }}
-            FDK_AAC_VERSION=${{ env.FDK_AAC_VERSION }}
-            FF_VERSION=${{ env.FF_VERSION }}
-            X265_VERSION=${{ env.X265_VERSION }}
-          context: .
-
-      - name: Build for linux/ppc64le
-        uses: docker/build-push-action@v4
-        with:
-          platforms: linux/ppc64le
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}

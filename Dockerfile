@@ -14,6 +14,7 @@ RUN apk add --no-cache \
     bash \
     build-base \
     g++ \
+    gcc \
     pkgconfig \
     yasm \
     nasm \
@@ -35,9 +36,13 @@ RUN apk add --no-cache \
     libass-dev \
     libwebp-dev \
     freetype-dev \
+    libogg-dev \
+    libdrm-dev \
+    openssl-dev \
+    rtmpdump-dev \
+    rav1e-dev \
     sdl2-dev \
-    zlib-dev \
-    libdrm-dev
+    zlib-dev
 
 # Build and install libx265
 WORKDIR /tmp/x265
@@ -80,13 +85,20 @@ RUN wget https://ffmpeg.org/releases/ffmpeg-${FF_VERSION}.tar.xz && \
         --enable-libwebp \
         --enable-libfreetype \
         --enable-sdl2 \
+        --enable-librtmp \
+        --enable-librav1e \
+        --enable-postproc \
+        --enable-openssl \
         --disable-debug \
         --disable-doc \
+        --disable-ffplay \
         --extra-cflags="-I/usr/include" \
         --extra-ldflags="-L/usr/lib" && \
-    make -j$(nproc) && \
-    make install
+    make -j1 && \
+    make install && \
+    make distclean
 
+# Build ffmpeg release image
 FROM alpine:${ALPINE_VERSION}
 
 RUN addgroup -g 10000 -S ffmpeg && \
