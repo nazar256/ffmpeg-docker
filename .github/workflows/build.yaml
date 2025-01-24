@@ -35,6 +35,17 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
+    strategy:
+      matrix:
+        platform:
+          - linux/arm64/v8
+          - linux/arm/v7
+          - linux/arm/v6
+          - linux/ppc64le
+          - linux/s390x
+          - linux/amd64
+          - linux/386
+      fail-fast: false
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -54,12 +65,10 @@ jobs:
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
 
-        # does not build on alpine: 3.18
-        # builds on alpine: edge?(x265-yes,fdk-aac-no)
-      - name: Build linux/arm64/v8
+      - name: Build and push
         uses: docker/build-push-action@v4
         with:
-          platforms: linux/arm64/v8
+          platforms: ${{ matrix.platform }}
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}
@@ -70,79 +79,3 @@ jobs:
             FF_VERSION=${{ env.FF_VERSION }}
             X265_VERSION=${{ env.X265_VERSION }}
           context: .
-
-      - name: Build linux/arm/v7
-        uses: docker/build-push-action@v4
-        with:
-          platforms: linux/arm/v7
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}
-            ghcr.io/${{ github.repository_owner }}/ffmpeg:latest
-          build-args: |
-            ALPINE_VERSION=${{ env.ALPINE_VERSION }}
-            FDK_AAC_VERSION=${{ env.FDK_AAC_VERSION }}
-            FF_VERSION=${{ env.FF_VERSION }}
-            X265_VERSION=${{ env.X265_VERSION }}
-          context: .
-
-      - name: Build linux/s390x
-        uses: docker/build-push-action@v4
-        with:
-          platforms: linux/s390x
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}
-            ghcr.io/${{ github.repository_owner }}/ffmpeg:latest
-          build-args: |
-            ALPINE_VERSION=${{ env.ALPINE_VERSION }}
-            FDK_AAC_VERSION=${{ env.FDK_AAC_VERSION }}
-            FF_VERSION=${{ env.FF_VERSION }}
-            X265_VERSION=${{ env.X265_VERSION }}
-          context: .
-
-      - name: Build linux/arm/v6
-        uses: docker/build-push-action@v4
-        with:
-          platforms: linux/arm/v6
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}
-            ghcr.io/${{ github.repository_owner }}/ffmpeg:latest
-          build-args: |
-            ALPINE_VERSION=${{ env.ALPINE_VERSION }}
-            FDK_AAC_VERSION=${{ env.FDK_AAC_VERSION }}
-            FF_VERSION=${{ env.FF_VERSION }}
-            X265_VERSION=${{ env.X265_VERSION }}
-          context: .
-
-      - name: Build linux/ppc64le
-        uses: docker/build-push-action@v4
-        with:
-          platforms: linux/ppc64le
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}
-            ghcr.io/${{ github.repository_owner }}/ffmpeg:latest
-          build-args: |
-            ALPINE_VERSION=${{ env.ALPINE_VERSION }}
-            FDK_AAC_VERSION=${{ env.FDK_AAC_VERSION }}
-            FF_VERSION=${{ env.FF_VERSION }}
-            X265_VERSION=${{ env.X265_VERSION }}
-          context: .
-
-        # builds on alpine: 3.18
-      - name: Build amd64,386
-        uses: docker/build-push-action@v4
-        with:
-            platforms: linux/amd64,linux/386
-            push: true
-            tags: |
-                ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}
-                ghcr.io/${{ github.repository_owner }}/ffmpeg:latest
-            build-args: |
-                ALPINE_VERSION=${{ env.ALPINE_VERSION }}
-                FDK_AAC_VERSION=${{ env.FDK_AAC_VERSION }}
-                FF_VERSION=${{ env.FF_VERSION }}
-                X265_VERSION=${{ env.X265_VERSION }}
-            context: .

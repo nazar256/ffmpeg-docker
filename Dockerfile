@@ -105,6 +105,7 @@ RUN addgroup -g 10000 -S ffmpeg && \
 COPY --from=builder /usr/bin/ffmpeg /usr/bin/
 COPY --from=builder /usr/bin/ffprobe /usr/bin/
 COPY --from=builder /usr/lib/lib*.so* /usr/lib/
+COPY --from=builder /usr/local/lib/* /usr/local/lib/
 
 ENV LD_LIBRARY_PATH=/usr/local/lib:/usr/lib
 
