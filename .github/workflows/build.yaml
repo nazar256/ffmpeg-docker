@@ -26,7 +26,7 @@ on:
 env:
   RELEASE_VERSION: ${{ github.ref_type == 'tag' && github.ref_name }}
   FF_VERSION: ${{ inputs.ff_version || '7.1' }}
-  ALPINE_VERSION: ${{ inputs.alpine_version || '3.18' }}
+  ALPINE_VERSION: ${{ inputs.alpine_version || '3.19' }}
   FDK_AAC_VERSION: ${{ inputs.fdk_aac_version || '2.0.3' }}
   X265_VERSION: ${{ inputs.x265_version || '4.1' }}
 
@@ -53,36 +53,6 @@ jobs:
 
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
-
-      - name: Build linux/amd64
-        uses: docker/build-push-action@v4
-        with:
-          platforms: linux/amd64
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}
-            ghcr.io/${{ github.repository_owner }}/ffmpeg:latest
-          build-args: |
-            ALPINE_VERSION=${{ env.ALPINE_VERSION }}
-            FDK_AAC_VERSION=${{ env.FDK_AAC_VERSION }}
-            FF_VERSION=${{ env.FF_VERSION }}
-            X265_VERSION=${{ env.X265_VERSION }}
-          context: .
-
-      - name: Build linux/386
-        uses: docker/build-push-action@v4
-        with:
-          platforms: linux/386
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}
-            ghcr.io/${{ github.repository_owner }}/ffmpeg:latest
-          build-args: |
-            ALPINE_VERSION=${{ env.ALPINE_VERSION }}
-            FDK_AAC_VERSION=${{ env.FDK_AAC_VERSION }}
-            FF_VERSION=${{ env.FF_VERSION }}
-            X265_VERSION=${{ env.X265_VERSION }}
-          context: .
 
       - name: Build linux/arm64/v8
         uses: docker/build-push-action@v4
@@ -158,3 +128,18 @@ jobs:
             FF_VERSION=${{ env.FF_VERSION }}
             X265_VERSION=${{ env.X265_VERSION }}
           context: .
+
+      - name: Build linux/amd64
+        uses: docker/build-push-action@v4
+        with:
+            platforms: linux/amd64,linux/386
+            push: true
+            tags: |
+                ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}
+                ghcr.io/${{ github.repository_owner }}/ffmpeg:latest
+            build-args: |
+                ALPINE_VERSION=${{ env.ALPINE_VERSION }}
+                FDK_AAC_VERSION=${{ env.FDK_AAC_VERSION }}
+                FF_VERSION=${{ env.FF_VERSION }}
+                X265_VERSION=${{ env.X265_VERSION }}
+            context: .
