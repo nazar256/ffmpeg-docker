@@ -1,5 +1,5 @@
 ARG FF_VERSION=7.1
-ARG ALPINE_VERSION=3.19
+ARG ALPINE_VERSION=3
 ARG FDK_AAC_VERSION=2.0.3
 ARG X265_VERSION=4.1
 
@@ -45,7 +45,7 @@ RUN wget https://bitbucket.org/multicoreware/x265_git/downloads/x265_${X265_VERS
     tar xf x265_${X265_VERSION}.tar.gz && \
     cd x265_${X265_VERSION}/build/linux && \
     cmake ../../source && \
-    make -j$(nproc) && \
+    make -j1 && \
     make install
 
 # Build and install libfdk-aac
