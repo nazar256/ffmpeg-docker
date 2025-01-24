@@ -69,7 +69,7 @@ jobs:
             X265_VERSION=${{ env.X265_VERSION }}
           context: .
 
-      - name: Build
+      - name: Build linux/arm/v6
         uses: docker/build-push-action@v4
         with:
           platforms: linux/arm/v6
@@ -84,7 +84,7 @@ jobs:
             X265_VERSION=${{ env.X265_VERSION }}
           context: .
 
-      - name: Build
+      - name: Build linux/ppc64le
         uses: docker/build-push-action@v4
         with:
           platforms: linux/ppc64le
