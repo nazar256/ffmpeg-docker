@@ -1,0 +1,67 @@
+name: build
+
+on:
+  workflow_dispatch:
+    inputs:
+      ff_version:
+        description: 'FFmpeg version to use'
+        required: false
+        default: '7.1'
+        type: string
+      alpine_version:
+        description: 'Alpine version to use'
+        required: false
+        default: '3.21'
+        type: string
+      fdk_aac_version:
+        description: 'FDK-AAC version to use'
+        required: false
+        default: '2.0.3'
+        type: string
+  push:
+    tags:
+      - '*'
+
+env:
+  RELEASE_VERSION: ${{ github.ref_type == 'tag' && github.ref_name }}
+  FF_VERSION: ${{ inputs.ff_version || '7.1' }}
+  ALPINE_VERSION: ${{ inputs.alpine_version || '3.21' }}
+  FDK_AAC_VERSION: ${{ inputs.fdk_aac_version || '2.0.3' }}
+
+jobs:
+  buildx:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up QEMU
+        id: qemu
+        uses: docker/setup-qemu-action@v2
+        with:
+          image: tonistiigi/binfmt:latest
+          platforms: all
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          platforms: linux/arm64/v8,linux/arm/v7,linux/ppc64le,linux/amd64
+
+      - name: Log in to registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+
+      - name: Build
+        uses: docker/build-push-action@v4
+        with:
+          platforms: linux/arm64/v8,linux/arm/v7,linux/amd64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}
+            ghcr.io/${{ github.repository_owner }}/ffmpeg:latest
+          build-args: |
+            ALPINE_VERSION=${{ env.ALPINE_VERSION }}
+            FDK_AAC_VERSION=${{ env.FDK_AAC_VERSION }}
+            FF_VERSION=${{ env.FF_VERSION }}
+          context: .
