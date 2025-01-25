@@ -35,18 +35,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
-    strategy:
-      matrix:
-        platform:
-          - linux/arm64/v8
-          - linux/arm/v7
-          - linux/arm/v6
-          - linux/ppc64le
-          - linux/riscv64
-          - linux/s390x
-          - linux/amd64
-          - linux/386
-      fail-fast: false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -63,18 +51,18 @@ jobs:
         uses: docker/setup-buildx-action@v3
         with:
           version: v0.19.0
-          platforms: ${{ matrix.platform }}
+          platforms: linux/arm64/v8,linux/arm/v7,linux/arm/v6,linux/ppc64le,linux/riscv64,linux/s390x,linux/amd64,linux/386
           cache-binary: true
           install: true
           use: true
-
+          config: .github/buildkit.toml
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
 
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          platforms: ${{ matrix.platform }}
+          platforms: linux/arm64/v8,linux/arm/v7,linux/arm/v6,linux/ppc64le,linux/riscv64,linux/s390x,linux/amd64,linux/386
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}
