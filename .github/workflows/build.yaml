@@ -26,7 +26,7 @@ on:
 env:
   RELEASE_VERSION: ${{ github.ref_name }}
   FF_VERSION: ${{ inputs.ff_version || '7.1' }}
-  ALPINE_VERSION: ${{ inputs.alpine_version || '3.21' }}
+  ALPINE_VERSION: ${{ inputs.alpine_version || '3' }}
   FDK_AAC_VERSION: ${{ inputs.fdk_aac_version || '2.0.3' }}
   X265_VERSION: ${{ inputs.x265_version || '4.1' }}
 
@@ -39,12 +39,12 @@ jobs:
       matrix:
         platform:
           - linux/arm64/v8
-          # - linux/arm/v7
-          # - linux/arm/v6
-          # - linux/ppc64le
-          # - linux/s390x
-          # - linux/amd64
-          # - linux/386
+          - linux/arm/v7
+          - linux/arm/v6
+          - linux/ppc64le
+          - linux/s390x
+          - linux/amd64
+          - linux/386
       fail-fast: false
     steps:
       - name: Checkout
@@ -55,7 +55,7 @@ jobs:
         uses: docker/setup-qemu-action@v3
         with:
           image: tonistiigi/binfmt:qemu-v8.1.5
-          cache-image: false
+          cache-image: true
           platforms: arm64
 
       - name: Set up Docker Buildx
@@ -63,9 +63,9 @@ jobs:
         with:
           version: v0.19.0
           platforms: ${{ matrix.platform }}
+          cache-binary: true
           install: true
           use: true
-          # config: .github/buildkitd.toml
 
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
