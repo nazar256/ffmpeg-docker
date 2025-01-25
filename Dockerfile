@@ -42,7 +42,7 @@ RUN wget https://github.com/mstorsjo/fdk-aac/archive/v${FDK_AAC_VERSION}.tar.gz 
     tar xf v${FDK_AAC_VERSION}.tar.gz && \
     cd fdk-aac-${FDK_AAC_VERSION} && \
     autoreconf -fiv && \
-    ./configure --prefix=/usr --enable-shared && \
+    CFLAGS="-O2" ./configure --prefix=/usr --enable-shared && \
     make -j1 && \
     make install
 
