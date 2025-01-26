@@ -35,6 +35,17 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
+    strategy:
+      matrix:
+        platform:
+          - linux/arm64/v8
+          - linux/arm/v7
+          - linux/arm/v6
+          - linux/ppc64le
+          - linux/s390x
+          - linux/amd64
+          - linux/386
+      fail-fast: false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -55,21 +66,80 @@ jobs:
           cache-binary: true
           install: true
           use: true
-          config: .github/buildkit.toml
-      - name: Log in to registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+
+      - name: Log in to registries
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          platforms: linux/arm64/v8,linux/arm/v7,linux/arm/v6,linux/ppc64le,linux/s390x,linux/amd64,linux/386
+          platforms: ${{ matrix.platform }}
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}
-            ghcr.io/${{ github.repository_owner }}/ffmpeg:latest
+            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-${{ matrix.platform }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-${{ matrix.platform }}
           build-args: |
             ALPINE_VERSION=${{ env.ALPINE_VERSION }}
             FDK_AAC_VERSION=${{ env.FDK_AAC_VERSION }}
             FF_VERSION=${{ env.FF_VERSION }}
             X265_VERSION=${{ env.X265_VERSION }}
           context: .
+
+  merge-manifests:
+    needs: buildx
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - name: Log in to registries
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      - name: Create and push manifests
+        run: |
+          # Create manifest for release version (GitHub)
+          docker manifest create ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }} \
+            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/arm64/v8 \
+            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/arm/v7 \
+            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/arm/v6 \
+            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/ppc64le \
+            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/s390x \
+            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/amd64 \
+            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/386
+          docker manifest push ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}
+
+          # Create manifest for latest tag (GitHub)
+          docker manifest create ghcr.io/${{ github.repository_owner }}/ffmpeg:latest \
+            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/arm64/v8 \
+            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/arm/v7 \
+            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/arm/v6 \
+            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/ppc64le \
+            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/s390x \
+            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/amd64 \
+            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/386
+          docker manifest push ghcr.io/${{ github.repository_owner }}/ffmpeg:latest
+
+          # Create manifest for release version (Docker Hub)
+          docker manifest create ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }} \
+            ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/arm64/v8 \
+            ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/arm/v7 \
+            ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/arm/v6 \
+            ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/ppc64le \
+            ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/s390x \
+            ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/amd64 \
+            ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/386
+          docker manifest push ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}
+
+          # Create manifest for latest tag (Docker Hub)
+          docker manifest create ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:latest \
+            ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/arm64/v8 \
+            ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/arm/v7 \
+            ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/arm/v6 \
+            ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/ppc64le \
+            ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/s390x \
+            ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/amd64 \
+            ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-linux/386
+          docker manifest push ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:latest
