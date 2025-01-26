@@ -33,6 +33,7 @@ env:
 jobs:
   buildx:
     runs-on: ubuntu-latest
+    environment: main
     permissions:
       packages: write
     strategy:
@@ -95,6 +96,7 @@ jobs:
   merge-manifests:
     needs: buildx
     runs-on: ubuntu-latest
+    environment: main
     permissions:
       packages: write
     steps:
