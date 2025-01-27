@@ -91,6 +91,8 @@ jobs:
             FF_VERSION=${{ env.FF_VERSION }}
             X265_VERSION=${{ env.X265_VERSION }}
           context: .
+          provenance: false
+          outputs: type=image,push=true
 
   merge-manifests:
     needs: buildx
