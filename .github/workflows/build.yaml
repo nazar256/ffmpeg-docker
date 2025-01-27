@@ -44,7 +44,6 @@ jobs:
           - { arch: arm/v7, tag: armv7 }
           - { arch: arm/v6, tag: armv6 }
           - { arch: ppc64le, tag: ppc64le }
-          - { arch: s390x, tag: s390x }
           - { arch: 386, tag: 386 }
       fail-fast: false
     steps:
@@ -63,7 +62,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
         with:
           version: v0.19.0
-          platforms: linux/arm64/v8,linux/arm/v7,linux/arm/v6,linux/ppc64le,linux/s390x,linux/amd64,linux/386
+          platforms: linux/arm64/v8,linux/arm/v7,linux/arm/v6,linux/ppc64le,linux/amd64,linux/386
           cache-binary: true
           install: true
           use: true
@@ -113,7 +112,6 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-armv7 \
             ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-armv6 \
             ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-ppc64le \
-            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-s390x \
             ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-amd64 \
             ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-386
           docker manifest push ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}
@@ -124,7 +122,6 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-armv7 \
             ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-armv6 \
             ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-ppc64le \
-            ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-s390x \
             ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-amd64 \
             ghcr.io/${{ github.repository_owner }}/ffmpeg:${{ env.RELEASE_VERSION }}-386
           docker manifest push ghcr.io/${{ github.repository_owner }}/ffmpeg:latest
@@ -135,7 +132,6 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-armv7 \
             ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-armv6 \
             ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-ppc64le \
-            ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-s390x \
             ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-amd64 \
             ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-386
           docker manifest push ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}
@@ -146,7 +142,6 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-armv7 \
             ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-armv6 \
             ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-ppc64le \
-            ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-s390x \
             ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-amd64 \
             ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:${{ env.RELEASE_VERSION }}-386
           docker manifest push ${{ secrets.DOCKERHUB_USERNAME }}/ffmpeg:latest
