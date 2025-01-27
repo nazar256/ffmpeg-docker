@@ -1,11 +1,13 @@
 ARG FF_VERSION=7.1
 ARG ALPINE_VERSION=3
-ARG FDK_AAC_VERSION=2.0.3
+ARG FDK_AAC_VERSION=2.0.
+ARG X265_VERSION=4.1
 
 FROM alpine:${ALPINE_VERSION} AS builder
 
 ARG FDK_AAC_VERSION
 ARG FF_VERSION
+ARG X265_VERSION
 
 RUN apk add --no-cache \
     build-base \
@@ -19,7 +21,6 @@ RUN apk add --no-cache \
     automake \
     libtool \
     x264-dev \
-    x265-dev \
     libvpx-dev \
     opus-dev \
     lame-dev \
@@ -35,6 +36,15 @@ RUN apk add --no-cache \
     sdl2-dev \
     zlib-dev \
     libdrm-dev
+
+# Build and install libx265
+WORKDIR /tmp/x265
+RUN wget https://bitbucket.org/multicoreware/x265_git/downloads/x265_${X265_VERSION}.tar.gz && \
+    tar xf x265_${X265_VERSION}.tar.gz && \
+    cd x265_${X265_VERSION}/build/linux && \
+    cmake ../../source && \
+    make -j$(nproc) && \
+    make install
 
 # Build and install libfdk-aac
 WORKDIR /tmp/fdk-aac
