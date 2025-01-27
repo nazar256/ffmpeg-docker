@@ -13,6 +13,7 @@ RUN apk add --no-cache \
     build-base \
     cmake \
     make \
+    g++ \
     pkgconfig \
     yasm \
     nasm \
