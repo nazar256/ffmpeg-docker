@@ -11,6 +11,8 @@ ARG X265_VERSION
 
 RUN apk add --no-cache \
     build-base \
+    cmake \
+    make \
     pkgconfig \
     yasm \
     nasm \
